@@ -26,8 +26,7 @@
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_gravity="center"
-                android:background="@drawable/ic_account_circle"
-                />
+                android:background="@drawable/ic_account_circle" />
 
             <TextView
                 android:layout_width="match_parent"
