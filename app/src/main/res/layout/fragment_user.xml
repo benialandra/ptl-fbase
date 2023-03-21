@@ -27,7 +27,7 @@
                 android:layout_height="100dp"
                 android:layout_gravity="center"
                 android:background="@drawable/ic_account_circle"
-                tools:ignore="MissingClass" />
+                />
 
             <TextView
                 android:layout_width="match_parent"
