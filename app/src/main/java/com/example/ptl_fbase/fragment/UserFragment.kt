@@ -11,10 +11,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import com.example.ptl_fbase.LoginActivity
 
 import com.example.ptl_fbase.databinding.FragmentUserBinding
+import com.google.firebase.auth.EmailAuthCredential
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.storage.FirebaseStorage
 import java.io.ByteArrayOutputStream
 
@@ -44,7 +48,7 @@ class UserFragment : Fragment() {
         val user = auth.currentUser
 
         if (user != null) {
-            binding.edtName.setText(user.displayName)
+//            binding.edtName.setText(user.displayName)
             binding.edtEmail.setText(user.email)
             if (user.isEmailVerified) {
                 binding.iconNotVerify.visibility = View.GONE
@@ -62,8 +66,116 @@ class UserFragment : Fragment() {
         binding.btnLogout.setOnClickListener {
             btnLogout()
         }
+        binding.btnVerify.setOnClickListener {
+            emailVerification()
+        }
+        binding.btnChangePass.setOnClickListener {
+            chagePass()
+        }
 
+    }
 
+    private fun chagePass() {
+        auth = FirebaseAuth.getInstance()
+        val user = auth.currentUser
+        binding.cvCurrentPass.visibility = View.VISIBLE
+        binding.btnCancel.setOnClickListener {
+            binding.cvCurrentPass.visibility = View.GONE
+        }
+        binding.btnConfirm.setOnClickListener btnConfirm@{
+            val pass = binding.edtCurrentPassword.text.toString()
+            if (pass.isEmpty()) {
+                binding.edtCurrentPassword.error = "Password Jangan Kosong"
+                binding.edtCurrentPassword.requestFocus()
+                return@btnConfirm
+            }
+            user.let {
+                val userCredential = EmailAuthProvider.getCredential(it?.email!!, pass)
+                it.reauthenticate(userCredential).addOnCompleteListener { task ->
+                    when {
+                        task.isSuccessful -> {
+                            binding.cvCurrentPass.visibility = View.GONE
+                            binding.cvUpdatePass.visibility = View.VISIBLE
+                        }
+                        task.exception is FirebaseAuthInvalidCredentialsException -> {
+                            binding.edtCurrentPassword.error = "Password Salah"
+                            binding.edtCurrentPassword.requestFocus()
+                        }
+                        else -> {
+                            Toast.makeText(
+                                activity,
+                                "${task.exception?.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+            }
+            binding.btnNewCancel.setOnClickListener {
+                binding.cvCurrentPass.visibility = View.GONE
+                binding.cvUpdatePass.visibility = View.GONE
+            }
+            binding.btnNewChange.setOnClickListener NewChangePass@{
+                val newPass = binding.edtNewPass.text.toString()
+                val passConfirm = binding.edtConfirmPass.text.toString()
+                if (newPass.isEmpty()) {
+                    binding.edtCurrentPassword.error = "Password Jangan Kosong"
+                    binding.edtCurrentPassword.requestFocus()
+                    return@NewChangePass
+                }
+                if (passConfirm.isEmpty()) {
+                    binding.edtCurrentPassword.error = "Password Konfirmasi Jangan Kosong"
+                    binding.edtCurrentPassword.requestFocus()
+                    return@NewChangePass
+                }
+                if (newPass.length < 8) {
+                    binding.edtCurrentPassword.error = "Password Tidak Valid"
+                    binding.edtCurrentPassword.requestFocus()
+                    return@NewChangePass
+                }
+                if (passConfirm.length < 8) {
+                    binding.edtCurrentPassword.error = "Password Tidak Valid"
+                    binding.edtCurrentPassword.requestFocus()
+                    return@NewChangePass
+                }
+                if (newPass != passConfirm) {
+                    binding.edtCurrentPassword.error = "Password Tidak Valid"
+                    binding.edtCurrentPassword.requestFocus()
+                    return@NewChangePass
+                }
+                user?.let {
+                    user.updatePassword(newPass).addOnCompleteListener {
+                        if (it.isSuccessful) {
+                            Toast.makeText(activity, "Password Diupdate", Toast.LENGTH_SHORT).show()
+                            successLogout()
+                        } else {
+                            Toast.makeText(activity, "${it.exception?.message}", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun successLogout() {
+        auth = FirebaseAuth.getInstance()
+        auth.signOut()
+        val intent = Intent(context, LoginActivity::class.java)
+        startActivity(intent)
+        activity?.finish()
+        Toast.makeText(context, "Silahkan Login Kembali", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun emailVerification() {
+        val user = auth.currentUser
+        user?.sendEmailVerification()?.addOnCompleteListener {
+            if (it.isSuccessful) {
+                Toast.makeText(activity, "Email Dikirim", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(activity, "${it.exception?.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun goToCamera() {
@@ -91,15 +203,15 @@ class UserFragment : Fragment() {
         imgBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
         val img = baos.toByteArray()
         ref.putBytes(img).addOnCompleteListener {
-                if (it.isSuccessful) {
-                    ref.downloadUrl.addOnCompleteListener { Task ->
-                        Task.result.let { Uri ->
-                            imgUri = Uri
-                            binding.cviUser.setImageBitmap(imgBitmap)
-                        }
+            if (it.isSuccessful) {
+                ref.downloadUrl.addOnCompleteListener { Task ->
+                    Task.result.let { Uri ->
+                        imgUri = Uri
+                        binding.cviUser.setImageBitmap(imgBitmap)
                     }
                 }
             }
+        }
     }
 
     private fun btnLogout() {

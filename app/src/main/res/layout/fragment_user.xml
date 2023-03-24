@@ -75,12 +75,12 @@
 
             </LinearLayout>
 
-            <EditText
-                android:id="@+id/edt_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Name"
-                android:inputType="numberPassword" />
+<!--            <EditText-->
+<!--                android:id="@+id/edt_name"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:hint="Name"-->
+<!--                android:inputType="numberPassword" />-->
 
             <Button
                 android:id="@+id/btn_verify"
@@ -97,26 +97,26 @@
                 android:backgroundTint="#FFC107"
                 android:text="Change Password" />
 
-            <Button
-                android:id="@+id/btn_changeEmail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:backgroundTint="#00BCD4"
-                android:text="Change Email" />
+<!--            <Button-->
+<!--                android:id="@+id/btn_changeEmail"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:backgroundTint="#00BCD4"-->
+<!--                android:text="Change Email" />-->
 
-            <Button
-                android:id="@+id/btn_scanQR"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:backgroundTint="#FF5722"
-                android:text="Scan QR Code" />
+<!--            <Button-->
+<!--                android:id="@+id/btn_scanQR"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:backgroundTint="#FF5722"-->
+<!--                android:text="Scan QR Code" />-->
 
             <Button
                 android:id="@+id/btn_logout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:backgroundTint="#057022"
-                android:text="LogOutuser" />
+                android:backgroundTint="@color/black"
+                android:text="Logout" />
 
         </LinearLayout>
 
